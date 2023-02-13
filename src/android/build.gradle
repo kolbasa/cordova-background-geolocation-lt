@@ -65,23 +65,26 @@ if (capacitorConfig.exists()) {
 
 } else {
 
-  File packageJson = new File("${projectDir}/../../../package.json")
-  def config = (new JsonSlurper()).parseText(packageJson.text)
-  def plugins = config["cordova"]["plugins"]
-  def pluginConfig = null
-  if (plugins[CORDOVA_BACKGROUND_GEOLOCATION]) {
-    pluginName = CORDOVA_BACKGROUND_GEOLOCATION
-    pluginConfig = plugins[CORDOVA_BACKGROUND_GEOLOCATION]
-  } else if (plugins[CORDOVA_BACKGROUND_GEOLOCATION_LT]) {
-    pluginName = CORDOVA_BACKGROUND_GEOLOCATION_LT
-    pluginConfig = plugins[CORDOVA_BACKGROUND_GEOLOCATION_LT]
-  }
-  if (pluginConfig != null) {
-    playServicesLocationVersion = pluginConfig["GOOGLE_API_VERSION"]
-  } else {
-    println("* ERROR: cordova-background-geolocation failed to find plugin config from package.json")
+//   File packageJson = new File("${projectDir}/../../../package.json")
+//   def config = (new JsonSlurper()).parseText(packageJson.text)
+//   def plugins = config["cordova"]["plugins"]
+//   def pluginConfig = null
+//   if (plugins[CORDOVA_BACKGROUND_GEOLOCATION]) {
+//     pluginName = CORDOVA_BACKGROUND_GEOLOCATION
+//     pluginConfig = plugins[CORDOVA_BACKGROUND_GEOLOCATION]
+//   } else if (plugins[CORDOVA_BACKGROUND_GEOLOCATION_LT]) {
+//     pluginName = CORDOVA_BACKGROUND_GEOLOCATION_LT
+//     pluginConfig = plugins[CORDOVA_BACKGROUND_GEOLOCATION_LT]
+//   }
+//   if (pluginConfig != null) {
+//     playServicesLocationVersion = pluginConfig["GOOGLE_API_VERSION"]
+//   } else {
+//     println("* ERROR: cordova-background-geolocation failed to find plugin config from package.json")
+//   }
 
-  }
+  // Will be hardcoded for now, as the upper query does not work.
+  pluginName = CORDOVA_BACKGROUND_GEOLOCATION_LT
+  playServicesLocationVersion = "20.+"
 
   // Capacitor does not have the scope here to use android.applicationVariants.
   // Capacitor users must manually include app.gradle in their app's gradle file.
