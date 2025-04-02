@@ -3,7 +3,7 @@
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="cordova-background-geolocation-lt"
-    version="4.10.0">
+    version="4.17.4">
 
     <name>BackgroundGeolocation</name>
     <description>The most sophisticated, battery-efficient background-geolocation and geofencing plugin for Cordova</description>
@@ -16,7 +16,7 @@
         <engine name="cordova-ios" version=">=4.5.0"/>
     </engines>
 
-    <dependency id="cordova-plugin-background-fetch" version="~7.1.1" />
+    <dependency id="cordova-plugin-background-fetch" version="~7.2.4" />
 
     <js-module src="www/BackgroundGeolocation.js" name="BackgroundGeolocation">
         <clobbers target="window.BackgroundGeolocation" />
@@ -42,7 +42,17 @@
             </feature>
         </config-file>
 
-        <framework src="CocoaLumberjack" type="podspec" spec="~> 3.7.2" />
+
+        <podspec>
+            <config>
+                <source url="https://cdn.cocoapods.org/"/>
+            </config>
+            <pods>
+                <pod name="CocoaLumberjack" spec="~> 3.7.2" />
+            </pods>
+        </podspec>
+
+        <framework src="libstdc++.dylib" />
         <framework src="AudioToolbox.framework" weak="true" />
         <framework src="SystemConfiguration.framework" weak="true" />
         <framework src="AVFoundation.framework" weak="true" />
@@ -56,15 +66,15 @@
      <!-- android -->
     <platform name="android">
         <preference name="GOOGLE_API_VERSION" default="20.+" />
-
+        <preference name="HMS_LOCATION_VERSION" default="6.9.0.300" />
         <preference name="OKHTTP_VERSION" default="3.12.+" />
         <framework src="com.squareup.okhttp3:okhttp:$OKHTTP_VERSION"/>
         <preference name="EVENTBUS_VERSION" default="3.3.1" />
         <framework src="org.greenrobot:eventbus:$EVENTBUS_VERSION"/>
 
         <framework src="io.github.nishkarsh:android-permissions:2.1.6"/>
-        <framework src="org.slf4j:slf4j-api:1.7.36"/>
-        <framework src="com.github.tony19:logback-android:2.0.1"/>
+        <framework src="org.slf4j:slf4j-api:2.0.7"/>
+        <framework src="com.github.tony19:logback-android:3.0.0"/>
         <framework src="androidx.lifecycle:lifecycle-runtime:2.4.+" />
         <framework src="androidx.lifecycle:lifecycle-extensions:2.2.+" />
 

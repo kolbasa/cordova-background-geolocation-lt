@@ -19,7 +19,7 @@
 					<div class="brand">
 						<a class="logo" href="https://www.transistorsoft.com"><img src="../assets/images/transistor-logo-bw.svg" /></a>
 						<span class="title">
-							<a href="/cordova-background-geolocation-lt">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 4.10.0</span>
+							<a href="/cordova-background-geolocation-lt">[API Docs] Cordova Background Geolocation</a>&nbsp;<span class="tsd-flag ts-flagOptional ts-flagVersion">v 4.17.3</span>
 						</span>
 					</div>
 				</div>
@@ -245,6 +245,9 @@
 								</tr>
 								<tr>
 									<td><a href="../classes/backgroundgeolocation.html#activity_type_other_navigation">BackgroundGeolocation.ACTIVITY_TYPE_OTHER_NAVIGATION</a></td>
+								</tr>
+								<tr>
+									<td><a href="../classes/backgroundgeolocation.html#activity_type_airborne">BackgroundGeolocation.ACTIVITY_TYPE_AIRBORNE</a></td>
 								</tr>
 						</tbody></table>
 						<dl class="tsd-comment-tags">
@@ -904,7 +907,7 @@
 									<h2>Android</h2>
 								</a>
 								<p>Android can detect when the user has configured the device&#39;s <em>Settings-&gt;Location</em> in a manner that does not match your location request (eg: <a href="state.html#desiredaccuracy">desiredAccuracy</a>.  For example, if the user configures <em>Settings-&gt;Location-&gt;Mode</em> with <em>Battery Saving</em> (ie: Wifi only) but you&#39;ve specifically requested <a href="../classes/backgroundgeolocation.html#desired_accuracy_high">DESIRED_ACCURACY_HIGH</a> (ie: GPS), Android will show a dialog asking the user to confirm the desired changes.  If the user clicks <code>[OK]</code>, the OS will automcatically modify the Device settings.</p>
-								<p><img src="https://www.dropbox.com/s/3kuw1gzzbnajhgf/android-location-resolution-dialog.png?dl=1" alt=""></p>
+								<p><img src="https://dl.dropbox.com/scl/fi/t7bwdrmogr26rcmrbemkt/android-location-resolution-dialog.png?rlkey=won88t8xo5zcei7ktmurebb5t&dl=1" alt=""></p>
 								<p>This automated Android dialog will be shown in the following cases:</p>
 								<ul>
 									<li><a href="../classes/backgroundgeolocation.html#onproviderchange">BackgroundGeolocation.onProviderChange</a></li>
@@ -1143,25 +1146,35 @@
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p><strong><code>[Android-only]</code></strong> Enable extra timestamp meta data to be appended to each recorded location, including system-time.</p>
+							<p>Enable extra timestamp meta data to be appended to each recorded location, including system-time.</p>
 						</div>
 						<dl class="tsd-comment-tags">
 							<dt class="tsd-comment-tag-break">break</dt>
 							<dd><p>Some developers have reported GPS <a href="location.html#timestamp">Location.timestamp</a> issues with some Android devices.  This option will append extra meta-data related to the device&#39;s system time.</p>
-								<a href="#java-implementation" id="java-implementation" style="color: inherit; text-decoration: none;">
-									<h3>Java implementation</h3>
+								<a href="#android-implementation" id="android-implementation" style="color: inherit; text-decoration: none;">
+									<h2>Android implementation</h2>
 								</a>
-								<pre><code class="language-Java"><span style="color: #F92672">if</span><span style="color: #F8F8F2"> (enableTimestampMeta) {</span>
-<span style="color: #F8F8F2">    </span><span style="color: #66D9EF">JSONObject</span><span style="color: #F8F8F2"> timestampMeta </span><span style="color: #F92672">=</span><span style="color: #F8F8F2"> </span><span style="color: #F92672">new</span><span style="color: #F8F8F2"> </span><span style="color: #A6E22E">JSONObject</span><span style="color: #F8F8F2">();</span>
-<span style="color: #F8F8F2">    timestampMeta.</span><span style="color: #A6E22E">put</span><span style="color: #F8F8F2">(</span><span style="color: #E6DB74">&quot;time&quot;</span><span style="color: #F8F8F2">, mLocation.</span><span style="color: #A6E22E">getTime</span><span style="color: #F8F8F2">());</span>
-<span style="color: #F8F8F2">    </span><span style="color: #F92672">if</span><span style="color: #F8F8F2"> (Build.VERSION.SDK_INT </span><span style="color: #F92672">&gt;=</span><span style="color: #F8F8F2"> Build.VERSION_CODES.JELLY_BEAN_MR1) {</span>
-<span style="color: #F8F8F2">        timestampMeta.</span><span style="color: #A6E22E">put</span><span style="color: #F8F8F2">(</span><span style="color: #E6DB74">&quot;systemClockElaspsedRealtime&quot;</span><span style="color: #F8F8F2">, SystemClock.</span><span style="color: #A6E22E">elapsedRealtimeNanos</span><span style="color: #F8F8F2">()</span><span style="color: #F92672">/</span><span style="color: #AE81FF">1000000</span><span style="color: #F8F8F2">);</span>
-<span style="color: #F8F8F2">        timestampMeta.</span><span style="color: #A6E22E">put</span><span style="color: #F8F8F2">(</span><span style="color: #E6DB74">&quot;elapsedRealtime&quot;</span><span style="color: #F8F8F2">, mLocation.</span><span style="color: #A6E22E">getElapsedRealtimeNanos</span><span style="color: #F8F8F2">()</span><span style="color: #F92672">/</span><span style="color: #AE81FF">1000000</span><span style="color: #F8F8F2">);</span>
-<span style="color: #F8F8F2">    } </span><span style="color: #F92672">else</span><span style="color: #F8F8F2"> {</span>
-<span style="color: #F8F8F2">        timestampMeta.</span><span style="color: #A6E22E">put</span><span style="color: #F8F8F2">(</span><span style="color: #E6DB74">&quot;systemTime&quot;</span><span style="color: #F8F8F2">, System.</span><span style="color: #A6E22E">currentTimeMillis</span><span style="color: #F8F8F2">());</span>
-<span style="color: #F8F8F2">    }</span>
-<span style="color: #F8F8F2">    data.</span><span style="color: #A6E22E">put</span><span style="color: #F8F8F2">(</span><span style="color: #E6DB74">&quot;timestampMeta&quot;</span><span style="color: #F8F8F2">, timestampMeta);</span>
+								<pre><code class="language-Java"><span style="color: #66D9EF">JSONObject</span><span style="color: #F8F8F2"> timestampMeta </span><span style="color: #F92672">=</span><span style="color: #F8F8F2"> </span><span style="color: #F92672">new</span><span style="color: #F8F8F2"> </span><span style="color: #A6E22E">JSONObject</span><span style="color: #F8F8F2">();</span>
+<span style="color: #F8F8F2">timestampMeta.</span><span style="color: #A6E22E">put</span><span style="color: #F8F8F2">(</span><span style="color: #E6DB74">&quot;time&quot;</span><span style="color: #F8F8F2">, mLocation.</span><span style="color: #A6E22E">getTime</span><span style="color: #F8F8F2">());</span>
+<span style="color: #F92672">if</span><span style="color: #F8F8F2"> (Build.VERSION.SDK_INT </span><span style="color: #F92672">&gt;=</span><span style="color: #F8F8F2"> Build.VERSION_CODES.JELLY_BEAN_MR1) {</span>
+<span style="color: #F8F8F2">    timestampMeta.</span><span style="color: #A6E22E">put</span><span style="color: #F8F8F2">(</span><span style="color: #E6DB74">&quot;systemClockElaspsedRealtime&quot;</span><span style="color: #F8F8F2">, SystemClock.</span><span style="color: #A6E22E">elapsedRealtimeNanos</span><span style="color: #F8F8F2">()</span><span style="color: #F92672">/</span><span style="color: #AE81FF">1000000</span><span style="color: #F8F8F2">);</span>
+<span style="color: #F8F8F2">    timestampMeta.</span><span style="color: #A6E22E">put</span><span style="color: #F8F8F2">(</span><span style="color: #E6DB74">&quot;elapsedRealtime&quot;</span><span style="color: #F8F8F2">, mLocation.</span><span style="color: #A6E22E">getElapsedRealtimeNanos</span><span style="color: #F8F8F2">()</span><span style="color: #F92672">/</span><span style="color: #AE81FF">1000000</span><span style="color: #F8F8F2">);</span>
+<span style="color: #F8F8F2">} </span><span style="color: #F92672">else</span><span style="color: #F8F8F2"> {</span>
+<span style="color: #F8F8F2">    timestampMeta.</span><span style="color: #A6E22E">put</span><span style="color: #F8F8F2">(</span><span style="color: #E6DB74">&quot;systemTime&quot;</span><span style="color: #F8F8F2">, System.</span><span style="color: #A6E22E">currentTimeMillis</span><span style="color: #F8F8F2">());</span>
 <span style="color: #F8F8F2">}</span>
+</code></pre>
+								<a href="#ios-implementation" id="ios-implementation" style="color: inherit; text-decoration: none;">
+									<h2>iOS Implementation</h2>
+								</a>
+								<pre><code class="language-Java"><span style="color: #F8F8F2"> </span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2"> </span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2"> systemTime </span><span style="color: #F92672">=</span><span style="color: #F8F8F2"> (</span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2"> </span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2">)([[</span><span style="color: #66D9EF">NSDate</span><span style="color: #F8F8F2"> date] timeIntervalSince1970] </span><span style="color: #F92672">*</span><span style="color: #F8F8F2"> </span><span style="color: #AE81FF">1000.0</span><span style="color: #F8F8F2">);</span>
+<span style="color: #F8F8F2"> </span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2"> </span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2"> locationTime </span><span style="color: #F92672">=</span><span style="color: #F8F8F2"> (</span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2"> </span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2">)([_location.timestamp timeIntervalSince1970] </span><span style="color: #F92672">*</span><span style="color: #F8F8F2"> </span><span style="color: #AE81FF">1000.0</span><span style="color: #F8F8F2">);</span>
+<span style="color: #F8F8F2"> </span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2"> </span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2"> uptime </span><span style="color: #F92672">=</span><span style="color: #F8F8F2"> (</span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2"> </span><span style="color: #66D9EF">long</span><span style="color: #F8F8F2">) [self.class uptime] </span><span style="color: #F92672">*</span><span style="color: #F8F8F2"> </span><span style="color: #AE81FF">1000</span><span style="color: #F8F8F2">;</span>
+
+<span style="color: #F8F8F2"> </span><span style="color: #F92672">return</span><span style="color: #F8F8F2"> @{</span>
+<span style="color: #F8F8F2">     @</span><span style="color: #E6DB74">&quot;time&quot;</span><span style="color: #F92672">:</span><span style="color: #F8F8F2"> @(locationTime),</span>
+<span style="color: #F8F8F2">     @</span><span style="color: #E6DB74">&quot;systemTime&quot;</span><span style="color: #F92672">:</span><span style="color: #F8F8F2"> @(systemTime),</span>
+<span style="color: #F8F8F2">     @</span><span style="color: #E6DB74">&quot;systemClockElapsedRealtime&quot;</span><span style="color: #F92672">:</span><span style="color: #F8F8F2"> @(uptime)</span>
+<span style="color: #F8F8F2"> };</span>
 </code></pre>
 							</dd>
 						</dl>
@@ -1420,6 +1433,8 @@
 						</div>
 						<dl class="tsd-comment-tags">
 							<dt class="tsd-comment-tag-break">break</dt>
+							<dd></dd>
+							<dt class="tsd-comment-tag-deprecated">deprecated</dt>
 							<dd>
 								<a href="#⚠️-android-80" id="⚠️-android-80" style="color: inherit; text-decoration: none;">
 									<h3>⚠️ Android 8.0+</h3>
@@ -3237,7 +3252,7 @@
 						<div class="lead">
 							<p>[<strong>iOS Only</strong>] A Boolean indicating whether the status bar changes its appearance when an app uses location services in the background with <code>Always</code> authorization.</p>
 						</div>
-						<p>The default value of this property is <code>false</code>. The background location usage indicator is a blue bar or a blue pill in the status bar on iOS; on watchOS the indicator is a small icon. Users can tap the indicator to return to your app.</p>
+						<p>The default value of this property is <code>true</code>. The background location usage indicator is a blue bar or a blue pill in the status bar on iOS; on watchOS the indicator is a small icon. Users can tap the indicator to return to your app.</p>
 						<p>This property affects only apps that received <code>Always</code> authorization. When such an app moves to the background, the system uses this property to determine whether to change the status bar appearance to indicate that location services are in use. Set this value to true to maintain transparency with the user.</p>
 						<p>For apps with When In Use authorization, the system changes the appearance of the status bar when the app uses location services in the background.</p>
 					</div>
@@ -3564,8 +3579,9 @@
 					</aside>
 					<div class="tsd-comment tsd-typography">
 						<div class="lead">
-							<p><strong><code>[Android-only]</code></strong> Configures a comma-separated list of motion-activities which are allow to trigger location-tracking.</p>
+							<p>Configures a comma-separated list of motion-activities which are allow to trigger location-tracking.</p>
 						</div>
+						<p><strong>⚠️ Warning:</strong> Requires that the user grant your app the &quot;<em>Motion/Health</em>&quot; permission.</p>
 						<dl class="tsd-comment-tags">
 							<dt class="tsd-comment-tag-break">break</dt>
 							<dd><p>These are the comma-delimited list of <a href="https://developers.google.com/android/reference/com/google/android/gms/location/DetectedActivity">activity-names</a> returned by the <code>ActivityRecognition</code> API which will trigger a state-change from <strong>stationary</strong> to <strong>moving</strong>.  By default, the plugin will trigger on <strong>any</strong> of the <strong>moving-states</strong>:</p>
@@ -4330,14 +4346,13 @@
 </div>
 <div class="overlay"></div>
 <script src="../assets/js/main.js"></script>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4NNZKTE395"></script>
 <script>
-        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-        ga('create', 'UA-102968-14', 'auto');
-        ga('send', 'pageview');
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-4NNZKTE395');
     </script>
 </body>
 </html>

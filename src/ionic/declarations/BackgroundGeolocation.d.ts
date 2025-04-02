@@ -28,7 +28,7 @@ declare module "cordova-background-geolocation-lt" {
   /**
   * Primary API of the SDK.
   * @break
-  *
+  * 
   * ## 📚 Help
   * - 📘 [Philosophy of Operation](github:wiki/Philosophy-of-Operation)
   * - 📘 [[HttpEvent | HTTP Guide]].
@@ -215,6 +215,7 @@ declare module "cordova-background-geolocation-lt" {
     static ACTIVITY_TYPE_AUTOMOTIVE_NAVIGATION:ActivityType;
     static ACTIVITY_TYPE_FITNESS:ActivityType;
     static ACTIVITY_TYPE_OTHER_NAVIGATION:ActivityType;
+    static ACTIVITY_TYPE_AIRBORNE:ActivityType;
 
     static PERSIST_MODE_ALL: PersistMode;
     static PERSIST_MODE_LOCATION: PersistMode;
@@ -668,8 +669,8 @@ declare module "cordova-background-geolocation-lt" {
     * Registers a Javascript callback to execute in the Android "Headless" state, where the app has been terminated configured with
     * [[stopOnTerminate]]`:false`.  * The received `event` object contains a `name` (the event name) and `params` (the event data-object).
     *
-    * ### ⚠️ Note Cordova
-    * - Javascript headless callbacks are not supported by Cordova.
+    * ### ⚠️ Note Cordova &amp; Capacitor
+    * - Javascript headless callbacks are not supported by Cordova or Capacitor.  See [Android Headless Mode](github:wiki/Android-Headless-Mode) 
     *
     * ### ⚠️ Warning:
     * - You __must__ `registerHeadlessTask` in your application root file (eg: `index.js`).
@@ -699,7 +700,7 @@ declare module "cordova-background-geolocation-lt" {
     * - 📘 [Android Headless Mode](github:wiki/Android-Headless-Mode).
     *
     */
-    static registerHeadlessTask(callback:(event:Object)=>any): void;
+    static registerHeadlessTask(callback:(event:Object)=> Promise<void>): void;
 
     /**
     *
@@ -725,13 +726,23 @@ declare module "cordova-background-geolocation-lt" {
     * });
     * ```
     *
-    * ### ⚠️ Warning: You must call `#ready` **once** and **only** once, each time your app is launched.
+    * ### ⚠️ Warning: You must call __`.ready(confg)`__ **once** and **only** once, each time your app is launched.
     * - Do not hide the call to `#ready` within a view which is loaded only by clicking a UI action.  This is particularly important
     * for iOS in the case where the OS relaunches your app in the background when the device is detected to be moving.  If you don't ensure that `#ready` is called in this case, tracking will not resume.
     *
     * ### The [[reset]] method.
     *
     * If you wish, you can use the [[reset]] method to reset all [[Config]] options to documented default-values (with optional overrides):
+    *
+    * ### [[Config.reset]]: false
+    *
+    * Configuring the plugin with __`reset: false`__ should generally be avoided unless you know *exactly* what it does.  People often find this from the *Demo* app.  If you do configure `reset: false`, you'll find that your `Config` provided to `.ready` is consumed **only at first launch after install**.  Thereafter, the plugin will ignore any changes you've provided there.  The only way to change the config then is to use [[setConfig]].
+    * 
+    * You will especially not want to use `reset: false` during development, while you're fine-tuning your `Config` options.
+    * 
+    * The reason the *Demo* app uses `reset: false` is because it hosts an advanced "*Settings*" screen to tune the `Config` at runtime and we don't want those runtime changes to be overwritten by `.ready(config)` each time the app launches.
+    * 
+    * ⚠️ If you *don't* undestand what __`reset: false`__ does, **NO NOT USE IT**.  If you blindly copy/pasted it from the *Demo* app, **REMOVE IT** from your `Config`.
     *
     * @example
     * ```typescript
@@ -938,7 +949,7 @@ declare module "cordova-background-geolocation-lt" {
     /**
     * Sends a signal to OS that you wish to perform a long-running task.
     *
-    * The will will keep your running in the background and not suspend it until you signal completion with the [[stopBackgroundTask]] method.  Your callback will be provided with a single parameter `taskId`
+    * The OS will keep your running in the background and not suspend it until you signal completion with the [[stopBackgroundTask]] method.  Your callback will be provided with a single parameter `taskId`
     * which you will send to the [[stopBackgroundTask]] method.
     *
     * @example
@@ -979,9 +990,9 @@ declare module "cordova-background-geolocation-lt" {
     * ```
     * ### Android
     *
-    * The Android implementation launches a foreground-service, along with the accompanying persistent foreground [[Notification]].
+    * The Android implementation launches a [`WorkManager`](https://developer.android.com/topic/libraries/architecture/workmanager) task.
     *
-    * ⚠️ The Android plugin hardcodes a limit of **30s** for your background-task before it automatically `FORCE KILL`s it.
+    * ⚠️ The Android plugin imposes a limit of **3 minutes** for your background-task before it automatically `FORCE KILL`s it.
     *
     *
     * Logging for Android background-tasks looks like this (when you see an hourglass ⏳ icon, a foreground-service is active)

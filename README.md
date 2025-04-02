@@ -102,22 +102,74 @@ $ cordova plugin add https://github.com/transistorsoft/cordova-background-geoloc
   xmlns:cdv="http://cordova.apache.org/ns/1.0">
 ```
 
-- Within the `<platform name="android">` container, add the `license_key` key using a `<config-file />` element:
+- Within the `<platform name="android">` container, add the `license` key using a `<config-file />` element:
 - :information_source: If you haven't yet [purchased a license](http://www.transistorsoft.com/shop/products/cordova-background-geolocation), you can skip this step &mdash; the plugin is **fully functional in *DEBUG* builds without a license** so you can *try before you buy*.  You will see a Toast message "*License Validation Failure*" when your app boots &mdash; **ignore it**.
 
 ```xml
 <platform name="android">
-      <!-- background-geolocation -->
+      <!-- Cordova Background Geolocation License -->
       <config-file parent="/manifest/application" target="app/src/main/AndroidManifest.xml">
           <meta-data
-            android:name="com.transistorsoft.locationmanager.license_key"
+            android:name="com.transistorsoft.locationmanager.license"
             android:value="YOUR_LICENSE_KEY_HERE" />
       </config-file>
-      <!-- /background-geolocation -->
 </platform>
 ```
 
-### AndroidX (`cordova-android >= 9.0.0`)
+#### Polygon Geofencing Add-on
+
+If you've purchased a license for the [Polygon Geofencing add-on](https://shop.transistorsoft.com/products/polygon-geofencing), add the following license key to your __`AndroidManifest`__ (Polygon Geofencing is fully functional in DEBUG builds so you can try before you buy):
+
+```xml
+<platform name="android">
+      <!-- Cordova Background Geolocation License -->
+      <config-file parent="/manifest/application" target="app/src/main/AndroidManifest.xml">
+          <meta-data
+            android:name="com.transistorsoft.locationmanager.polygon.license"
+            android:value="YOUR_POLYGON_LICENSE_KEY_HERE" />
+      </config-file>
+</platform>
+```
+
+#### Huawei Mobile Services (HMS) Support
+
+If you've [purchased an *HMS Background Geolocation* License](https://shop.transistorsoft.com/collections/frontpage/products/huawei-background-geolocation) for installing the plugin on _Huawei_ devices without *Google Play Services* installed, add your *HMS Background Geolocation* license key:
+
+```xml
+<platform name="android">
+      <!-- Cordova Background Geolocation License -->
+      <config-file parent="/manifest/application" target="app/src/main/AndroidManifest.xml">
+          <meta-data
+            android:name="com.transistorsoft.locationmanager.license"
+            android:value="YOUR_LICENSE_KEY_HERE" />
+      </config-file>
+      <!-- HMS Background Geolocation License -->
+      <config-file parent="/manifest/application" target="app/src/main/AndroidManifest.xml">
+          <meta-data
+            android:name="com.transistorsoft.locationmanager.hms.license"
+            android:value="YOUR_HMS_LICENSE_KEY_HERE" />
+      </config-file>
+</platform>
+```
+:warning: Huawei HMS support requires `cordova-background-geolocation >= 3.11.0`.
+
+#### `AlarmManager` "Exact Alarms" (optional)
+
+The plugin uses __`AlarmManager`__ "exact alarms" for precise scheduling of events (eg: __`Config.stopTimeout`__, __`Config.motionTriggerDelay`__, __`Config.schedule`__).  *Android 14 (SDK 34)*, has restricted usage of ["`AlarmManager` exact alarms"](https://developer.android.com/about/versions/14/changes/schedule-exact-alarms).  To continue using precise timing of events with *Android 14*, you can manually add this permission to your __`AndroidManifest`__.  Otherwise, the plugin will gracefully fall-back to "*in-exact* `AlarmManager` scheduling".  For more information about Android's __`AlarmManager`__, see the [Android API Docs](https://developer.android.com/training/scheduling/alarms).
+
+:open_file_folder: In your __`config.xml`__, add the following block within the __`<platform name="android">`__ block (**exactly as-shown**:
+
+```xml
+  <platform name="android">
+      <config-file parent="/manifest" target="app/src/main/AndroidManifest.xml">
+          <uses-permission android:minSdkVersion="34" android:name="android.permission.USE_EXACT_ALARM" />
+      </config-file>
+  </platform>
+```
+
+:warning: It has been announced that *Google Play Store* [has plans to impose greater scrutiny](https://support.google.com/googleplay/android-developer/answer/13161072?sjid=3640341614632608469-NA) over usage of this permission (which is why the plugin does not automatically add it).
+
+#### AndroidX (`cordova-android >= 9.0.0`)
 
 It's *highly* recommended to configure your app for *Android X* when using *Cordova 10* / `cordova-android >= 9.0.0`.
 
@@ -130,16 +182,13 @@ It's *highly* recommended to configure your app for *Android X* when using *Cord
 </platform>
 ```
 
-```bash
-$ cordova plugin add cordova-plugin-androidx-adapter
-```
-
 :warning: If you see the following error, you need to configure your app for *Android X*.
 ```
 java.lang.RuntimeException: Unable to get provider com.transistorsoft.locationmanager.util.LogFileProvider: java.lang.ClassNotFoundException
 ```
 
 ------------------------------------------------------------------------------------------
+
 :warning: On older version of Cordova, If you **change your license key** after building android, you might receive an error:
 ```diff
 BUILD FAILED in 1s
@@ -181,7 +230,7 @@ $ cordova platform add android
 Sets the desired version of `play-services-location` dependency.  Many other plugins require `play-services` dependencies, (eg: `cordova-plugin-googlemaps`, `phonegap-plugin-push`):  If the version of `play-services` and/or `firebase` is not aligned to the **same** version for **ALL** plugins, your build **will fail**.
 
 ```
-$ cordova plugin add <git-url> --variable GOOGLE_API_VERSION=20.0.0
+$ cordova plugin add cordova-background-geolocation-lt --variable GOOGLE_API_VERSION=20.0.0
 ```
 
 ##### `@variable OKHTTP_VERSION ["3.12.+"]`
@@ -214,6 +263,66 @@ Paste **all** the following elements into the `<platform name="ios">` container:
     </config-file>
     <!-- /background-geolocation -->
 </platform>
+```
+
+#### Privacy Manifest
+
+Apple now requires apps provide a [Privacy Manifest for "sensitive" APIs](https://developer.apple.com/documentation/bundleresources/privacy_manifest_files/describing_use_of_required_reason_api?language=objc) which could be abused for "fingerprinting" a user for malicious marketing activity.
+
+:warning: You **MUST** upgrade your `cordova-ios` platform to [`>= 7.1.0` for *iOS Privacy Manifest Support*](https://github.com/apache/cordova-ios/blob/master/RELEASENOTES.md#710-apr-01-2024):
+
+- :open_file_folder: __`config.xml`__
+- Add the following `<privacy-manifest>` __four__ block within the `NSPrivacyAccessedAPITypes` container:
+
+```xml
+  <platform name="ios">
+      <privacy-manifest>
+          <key>NSPrivacyAccessedAPITypes</key>
+          <array>
+              <!-- [1] cordova-background-fetch: UserDefaults -->
+              <dict>
+                  <key>NSPrivacyAccessedAPIType</key>
+                  <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+
+                  <key>NSPrivacyAccessedAPITypeReasons</key>
+                  <array>
+                      <string>CA92.1</string>
+                  </array>
+              </dict>
+
+              <!-- [2] cordova-background-geolocation: UserDefaults -->
+              <dict>
+                  <key>NSPrivacyAccessedAPIType</key>
+                  <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+
+                  <key>NSPrivacyAccessedAPITypeReasons</key>
+                  <array>
+                      <string>CA92.1</string>
+                      <string>1C8F.1</string>
+                  </array>
+              </dict>
+              <!-- [3] cordova-background-geolocation (CocoaLumberjack): FileTimestamp -->
+              <dict>
+                  <key>NSPrivacyAccessedAPIType</key>
+                  <string>NSPrivacyAccessedAPICategoryFileTimestamp</string>
+                  <key>NSPrivacyAccessedAPITypeReasons</key>
+                  <array>
+                      <string>C617.1</string>
+                      <string>0A2A.1</string>
+                  </array>
+              </dict>
+              <!-- [4] cordova-background-geolocation (CocoaLumberjack): DiskSpace -->
+              <dict>
+                  <key>NSPrivacyAccessedAPIType</key>
+                  <string>NSPrivacyAccessedAPICategoryDiskSpace</string>
+                  <key>NSPrivacyAccessedAPITypeReasons</key>
+                  <array>
+                      <string>E174.1</string>
+                  </array>
+              </dict>
+          </array>
+      </privacy-manifest>
+  </platform>
 ```
 
 #### Configuring for `useSignificantChangesOnly`

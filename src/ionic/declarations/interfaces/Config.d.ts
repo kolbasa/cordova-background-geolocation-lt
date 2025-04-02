@@ -1739,7 +1739,7 @@ declare module "cordova-background-geolocation-lt" {
     /**
     * [__iOS Only__] A Boolean indicating whether the status bar changes its appearance when an app uses location services in the background with `Always` authorization.
     *
-    * The default value of this property is `false`. The background location usage indicator is a blue bar or a blue pill in the status bar on iOS; on watchOS the indicator is a small icon. Users can tap the indicator to return to your app.
+    * The default value of this property is `true`. The background location usage indicator is a blue bar or a blue pill in the status bar on iOS; on watchOS the indicator is a small icon. Users can tap the indicator to return to your app.
     *
     * This property affects only apps that received `Always` authorization. When such an app moves to the background, the system uses this property to determine whether to change the status bar appearance to indicate that location services are in use. Set this value to true to maintain transparency with the user.
     *
@@ -1934,7 +1934,7 @@ declare module "cordova-background-geolocation-lt" {
     *
     * Android can detect when the user has configured the device's *Settings->Location* in a manner that does not match your location request (eg: [[desiredAccuracy]].  For example, if the user configures *Settings->Location->Mode* with *Battery Saving* (ie: Wifi only) but you've specifically requested [[DESIRED_ACCURACY_HIGH]] (ie: GPS), Android will show a dialog asking the user to confirm the desired changes.  If the user clicks `[OK]`, the OS will automcatically modify the Device settings.
     *
-    * ![](https://www.dropbox.com/s/3kuw1gzzbnajhgf/android-location-resolution-dialog.png?dl=1)
+    * ![](https://dl.dropbox.com/scl/fi/t7bwdrmogr26rcmrbemkt/android-location-resolution-dialog.png?rlkey=won88t8xo5zcei7ktmurebb5t&dl=1)
     *
     * This automated Android dialog will be shown in the following cases:
     * - [[BackgroundGeolocation.onProviderChange]]
@@ -1969,6 +1969,7 @@ declare module "cordova-background-geolocation-lt" {
     * | [[BackgroundGeolocation.ACTIVITY_TYPE_AUTOMOTIVE_NAVIGATION]]  |
     * | [[BackgroundGeolocation.ACTIVITY_TYPE_FITNESS]]                |
     * | [[BackgroundGeolocation.ACTIVITY_TYPE_OTHER_NAVIGATION]]       |
+    * | [[BackgroundGeolocation.ACTIVITY_TYPE_AIRBORNE]]               |
     *
     * @example
   	* ```typescript
@@ -2126,25 +2127,36 @@ declare module "cordova-background-geolocation-lt" {
     allowIdenticalLocations?: boolean;
 
     /**
-    * __`[Android-only]`__ Enable extra timestamp meta data to be appended to each recorded location, including system-time.
+    * Enable extra timestamp meta data to be appended to each recorded location, including system-time.
     * @break
     *
     * Some developers have reported GPS [[Location.timestamp]] issues with some Android devices.  This option will append extra meta-data related to the device's system time.
     *
-    * ### Java implementation
+    * ## Android implementation
     *
     * ```Java
-    * if (enableTimestampMeta) {
-    *     JSONObject timestampMeta = new JSONObject();
-    *     timestampMeta.put("time", mLocation.getTime());
-    *     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-    *         timestampMeta.put("systemClockElaspsedRealtime", SystemClock.elapsedRealtimeNanos()/1000000);
-    *         timestampMeta.put("elapsedRealtime", mLocation.getElapsedRealtimeNanos()/1000000);
-    *     } else {
-    *         timestampMeta.put("systemTime", System.currentTimeMillis());
-    *     }
-    *     data.put("timestampMeta", timestampMeta);
+    * JSONObject timestampMeta = new JSONObject();
+    * timestampMeta.put("time", mLocation.getTime());
+    * if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+    *     timestampMeta.put("systemClockElaspsedRealtime", SystemClock.elapsedRealtimeNanos()/1000000);
+    *     timestampMeta.put("elapsedRealtime", mLocation.getElapsedRealtimeNanos()/1000000);
+    * } else {
+    *     timestampMeta.put("systemTime", System.currentTimeMillis());
     * }
+    * ```
+    *
+    * ## iOS Implementation
+    *
+    * ```Java
+    *  long long systemTime = (long long)([[NSDate date] timeIntervalSince1970] * 1000.0);
+    *  long long locationTime = (long long)([_location.timestamp timeIntervalSince1970] * 1000.0);
+    *  long long uptime = (long long) [self.class uptime] * 1000;
+    *
+    *  return @{
+    *      @"time": @(locationTime),
+    *      @"systemTime": @(systemTime),
+    *      @"systemClockElapsedRealtime": @(uptime)
+    *  };
     * ```
     */
     enableTimestampMeta?: boolean;
@@ -2160,7 +2172,10 @@ declare module "cordova-background-geolocation-lt" {
 
     /**
 
-    * __`[Android-only]`__ Configures a comma-separated list of motion-activities which are allow to trigger location-tracking.
+    * Configures a comma-separated list of motion-activities which are allow to trigger location-tracking.
+
+    * __⚠️ Warning:__ Requires that the user grant your app the "*Motion/Health*" permission.
+    * 
     * @break
     *
     * These are the comma-delimited list of [activity-names](https://developers.google.com/android/reference/com/google/android/gms/location/DetectedActivity) returned by the `ActivityRecognition` API which will trigger a state-change from **stationary** to **moving**.  By default, the plugin will trigger on **any** of the **moving-states**:
@@ -2249,6 +2264,8 @@ declare module "cordova-background-geolocation-lt" {
     * __`[Android only]`__ Configure the plugin service to run as a more robust "Foreground Service".
     * @break
     *
+    * @deprecated 
+    * 
     * ### ⚠️ Android 8.0+
     *
     * Defaults to `true` and cannot be set to `false`.  Due to strict new [Background Execution Limits](https://www.youtube.com/watch?v=Pumf_4yjTMc) in Android 8, the plugin *enforces* **`foregroundService: true`**.

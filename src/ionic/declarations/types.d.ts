@@ -98,6 +98,7 @@ declare module "cordova-background-geolocation-lt" {
 	 * | [[ACTIVITY_TYPE_AUTOMOTIVE_NAVIGATION]]  |
 	 * | [[ACTIVITY_TYPE_FITNESS]]                |
 	 * | [[ACTIVITY_TYPE_OTHER_NAVIGATION]]       |
+	 * | [[ACTIVITY_TYPE_AIRBORNE]]
 	 *
 	 * ℹ️  For more information, see [Apple docs](https://developer.apple.com/reference/corelocation/cllocationmanager/1620567-activitytype?language=objc).
 	 */
@@ -141,7 +142,7 @@ declare module "cordova-background-geolocation-lt" {
     * | 408   | Location timeout            |
     * | 499   | Location request cancelled  |
 	*/
-	type LocationError = 0 | 1 | 2 | 408 | 499;
+	type LocationError = 0 | 1 | 2 | 3 | 408 | 499;
 
 	/**
 	* iOS Location authorization request.
@@ -156,7 +157,7 @@ declare module "cordova-background-geolocation-lt" {
 
 	type PersistMode = -1 | 0 | 1 | 2;
 
-	type Extras = {[key: string]: string|null|number|boolean|Extras|string[]|number[]|boolean[]|Extras[]};
+	type Extras = {[key: string]: string|null|number|boolean|Extras|string[]|number[]|number[][]|boolean[]|Extras[]};
 
 	/**
 	* Controls ordering of [[SQLQuery.order]]

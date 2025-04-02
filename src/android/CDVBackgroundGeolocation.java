@@ -29,6 +29,7 @@ import com.transistorsoft.locationmanager.scheduler.TSScheduleManager;
 import com.transistorsoft.locationmanager.util.Sensors;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-import com.google.android.gms.common.GoogleApiAvailability;
+import com.transistorsoft.xms.g.common.ExtensionApiAvailability;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -537,7 +538,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         TSCurrentPositionRequest.Builder builder = new TSCurrentPositionRequest.Builder(cordova.getActivity().getApplicationContext());
 
         builder.setCallback(new TSLocationCallback() {
-            @Override public void onLocation(TSLocation location) { callbackContext.success(location.toJson()); }
+            @Override public void onLocation(TSLocation location) {
+                try {
+                    callbackContext.success(location.toJson());
+                } catch (JSONException e) {
+                    TSLog.logger.error(e.getMessage(), e);
+                }
+            }
             @Override public void onError(Integer error) { callbackContext.error(error); }
         });
 
@@ -558,9 +565,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
         builder.setCallback(new TSLocationCallback() {
             @Override public void onLocation(TSLocation location) {
-                PluginResult result = new PluginResult(PluginResult.Status.OK, location.toJson());
-                result.setKeepCallback(true);
-                callbackContext.sendPluginResult(result);
+                try {
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, location.toJson());
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
+                } catch (JSONException e) {
+                    TSLog.logger.debug(e.getMessage(), e);
+                }
             }
             @Override public void onError(Integer error) { callbackContext.error(error); }
         });
@@ -634,6 +645,16 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
         if (config.has("notifyOnDwell"))    { builder.setNotifyOnDwell(config.getBoolean("notifyOnDwell")); }
         if (config.has("loiteringDelay"))   { builder.setLoiteringDelay(config.getInt("loiteringDelay")); }
         if (config.has("extras"))           { builder.setExtras(config.getJSONObject("extras")); }
+        // Polygon Geofence?
+        if (config.has("vertices")) {
+          JSONArray json = config.getJSONArray("vertices");
+          List<List<Double>> vertices = new ArrayList<>();
+          for (int i=0; i < json.length(); i++) {
+            JSONArray jVertex = json.getJSONArray(i);
+            vertices.add(Arrays.asList(jVertex.getDouble(0), jVertex.getDouble(1)));
+          }
+          builder.setVertices(vertices);
+        }
         return builder.build();
     }
 
@@ -679,7 +700,11 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void setOdometer(Float value, final CallbackContext callbackContext) {
         getAdapter().setOdometer(value, new TSLocationCallback() {
             @Override public void onLocation(TSLocation location) {
-                callbackContext.success(location.toJson());
+                try {
+                    callbackContext.success(location.toJson());
+                } catch (JSONException e) {
+                    TSLog.logger.error(e.getMessage(), e);
+                }
             }
             @Override public void onError(Integer error) {
                 callbackContext.error(error);
@@ -692,6 +717,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
             @Override public void onStart(int taskId) {
                 callbackContext.success(taskId);
             }
+            @Override public void onCancel(int taskId) { } // NO IMPLEMENTATION
         });
     }
 
@@ -860,9 +886,13 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
     private void addLocationListener(final CallbackContext callbackContext) {
         TSLocationCallback callback = new TSLocationCallback() {
             @Override public void onLocation(TSLocation location) {
-                PluginResult result = new PluginResult(PluginResult.Status.OK, location.toJson());
-                result.setKeepCallback(true);
-                callbackContext.sendPluginResult(result);
+                try {
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, location.toJson());
+                    result.setKeepCallback(true);
+                    callbackContext.sendPluginResult(result);
+                } catch (JSONException e) {
+                    TSLog.logger.error(e.getMessage(), e);
+                }
             }
             @Override public void onError(Integer errorCode) {
                 PluginResult result = new PluginResult(PluginResult.Status.ERROR, errorCode);
@@ -884,10 +914,14 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
                 JSONObject params = new JSONObject();
                 try {
                     params.put("isMoving", location.getIsMoving());
-                    params.put("location", location.toJson());
-                    PluginResult result = new PluginResult(PluginResult.Status.OK, params);
-                    result.setKeepCallback(true);
-                    callbackContext.sendPluginResult(result);
+                    try {
+                        params.put("location", location.toJson());
+                        PluginResult result = new PluginResult(PluginResult.Status.OK, params);
+                        result.setKeepCallback(true);
+                        callbackContext.sendPluginResult(result);
+                    } catch (JSONException e) {
+                        TSLog.logger.error(e.getMessage(), e);
+                    }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -1206,7 +1240,7 @@ public class CDVBackgroundGeolocation extends CordovaPlugin {
 
     private void handlePlayServicesConnectError(Integer errorCode) {
         Activity activity = cordova.getActivity();
-        GoogleApiAvailability.getInstance().getErrorDialog(activity, errorCode, 1001).show();
+        ExtensionApiAvailability.getInstance().getErrorDialog(activity, errorCode, 1001).show();
     }
 
     private BackgroundGeolocation getAdapter() {
